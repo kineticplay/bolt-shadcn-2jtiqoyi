@@ -12,7 +12,7 @@ export function LoginPage() {
   const { error, clearError } = useAuth();
 
   return (
-    <div className="min-h-[100dvh] w-full bg-[#FF00FF] md:bg-white">
+    <div className="min-h-[100dvh] w-full bg-[#D84040] md:bg-white">
       <div 
         className="
           min-h-[100dvh] 
@@ -43,7 +43,7 @@ export function LoginPage() {
               {error && (
                 <Alert variant="destructive" className="mb-4">
                   <XCircle className="h-4 w-4" />
-                  <AlertDescription>{error}</AlertDescription>
+                  <AlertDescription className="pt-1">{error}</AlertDescription>
                 </Alert>
               )}
               

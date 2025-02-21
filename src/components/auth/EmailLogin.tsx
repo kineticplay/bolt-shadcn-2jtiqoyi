@@ -112,7 +112,7 @@ export function EmailLogin() {
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="absolute right-0 top-0 h-full px-3"
+                    className="absolute right-0 top-0 h-full"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -129,7 +129,7 @@ export function EmailLogin() {
             control={form.control}
             name="rememberMe"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-center space-x-2">
+              <FormItem className="flex flex-row items-end space-x-2">
                 <FormControl>
                   <Checkbox
                     checked={field.value}
