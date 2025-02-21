@@ -12,18 +12,15 @@ export function LoginPage() {
   const { error, clearError } = useAuth();
 
   return (
-    <div className="min-h-[100dvh] w-full bg-[#D84040] md:bg-white">
+    <div className="min-h-[100dvh] w-full bg-[#D84040]">
       <div 
         className="
           min-h-[100dvh] 
           flex 
           items-center 
-          justify-center 
-          md:justify-end 
+          justify-center  
           py-safe 
-          px-safe
-          container
-        "
+          px-safe"
         style={{
           paddingTop: 'env(safe-area-inset-top)',
           paddingBottom: 'env(safe-area-inset-bottom)',
@@ -31,10 +28,10 @@ export function LoginPage() {
           paddingRight: 'env(safe-area-inset-right)',
         }}
       >
-        <div className="w-full max-w-md md:mr-[15%]">
-          <Card className="backdrop-blur-xl bg-white/90">
+        <div className="w-full max-w-sm">
+          <Card className="backdrop-blur-xl bg-white/70">
             <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
+              <CardTitle className="text-2xl font-bold">Welcome</CardTitle>
               <CardDescription>
                 Choose your preferred login method
               </CardDescription>
