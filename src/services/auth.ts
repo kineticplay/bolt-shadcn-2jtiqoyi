@@ -1,10 +1,15 @@
 import axios from '@/lib/axios';
 
 export interface LoginResponse {
-  status: boolean;
-  message: string;
+  statusCode: number;
   token: string;
-  user_details: any;
+  user_details: {
+    id: string;
+    fullname: string;
+    user_status: string;
+    extraData: any;
+    active_session_token: string;
+  };
 }
 
 export interface GenerateOtpResponse {
@@ -21,7 +26,12 @@ export interface VerifyOtpResponse {
 export const authService = {
   loginWithEmail: async (email: string, password: string) => {
     const response = await axios.post<LoginResponse>('/login', { email, password });
-    return response.data;
+    return {
+      status: response.data.statusCode === 200,
+      message: '',
+      token: response.data.token,
+      user_details: response.data.user_details
+    };
   },
 
   generateOtp: async (phone_number: string) => {

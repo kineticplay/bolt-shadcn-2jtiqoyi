@@ -10,7 +10,7 @@ function App() {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-14 ">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Welcome to the Dashboard</h1>
         <Button onClick={() => logout()} variant="outline">

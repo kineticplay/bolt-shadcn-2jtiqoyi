@@ -15,6 +15,7 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
 }
 
 @layer utilities {
@@ -90,10 +91,26 @@
   * {
     @apply border-border;
   }
+  
+  html, body {
+    @apply overflow-hidden fixed w-full h-full;
+  }
+  
   body {
     @apply bg-background text-foreground;
     margin: 0;
     min-width: 320px;
     min-height: 100vh;
+  }
+
+  /* Prevent iOS zoom on input focus */
+  input[type="text"],
+  input[type="email"],
+  input[type="number"],
+  input[type="password"],
+  input[type="tel"],
+  textarea {
+    @apply text-base;
+    -webkit-text-size-adjust: 100%;
   }
 }

@@ -67,6 +67,7 @@ export const useAuth = create<AuthState>((set) => ({
     try {
       set({ loading: true });
       await authService.logout();
+      localStorage.removeItem('auth_token');
       set({ 
         isAuthenticated: false, 
         user: null,

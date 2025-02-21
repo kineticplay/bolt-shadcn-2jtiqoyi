@@ -12,7 +12,7 @@ export function LoginPage() {
   const { error, clearError } = useAuth();
 
   return (
-    <div className="min-h-[100dvh] w-full bg-[#D84040]">
+    <div className="min-h-[100dvh] w-full bg-[#D84040] text-lg">
       <div 
         className="
           min-h-[100dvh] 
