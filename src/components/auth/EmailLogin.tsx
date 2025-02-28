@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/hooks/useAuth';
 import { authService } from '@/services/auth';
 import { useToast } from '@/hooks/use-toast';
@@ -32,6 +33,9 @@ export function EmailLogin() {
   const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
+  const [forgotPasswordError, setForgotPasswordError] = useState<string | null>(null);
+  const [forgotPasswordSuccess, setForgotPasswordSuccess] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
@@ -62,19 +66,49 @@ export function EmailLogin() {
 
   const onForgotPassword = async (data: z.infer<typeof forgotPasswordSchema>) => {
     try {
-      await authService.forgotPassword(data.email);
-      toast({
-        title: "Success",
-        description: "Password reset link sent to your email",
-      });
-      setForgotPasswordOpen(false);
-      forgotPasswordForm.reset();
+      setIsSubmitting(true);
+      setForgotPasswordError(null);
+      setForgotPasswordSuccess(null);
+
+      const response = await authService.forgotPassword(data.email);
+      
+      if (response.status) {
+        setForgotPasswordSuccess(`Password reset link sent to ${data.email}`);
+        toast({
+          title: "Reset Link Sent",
+          description: `Password reset instructions have been sent to ${data.email}`,
+        });
+        setTimeout(() => {
+          setForgotPasswordOpen(false);
+          forgotPasswordForm.reset();
+          setForgotPasswordSuccess(null);
+        }, 3000);
+      } else {
+        setForgotPasswordError(response.message);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: response.message,
+        });
+      }
     } catch (error) {
+      setForgotPasswordError('Failed to send reset link. Please try again.');
       toast({
         variant: "destructive",
         title: "Error",
         description: "Failed to send reset link. Please try again.",
       });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDialogClose = () => {
+    if (!isSubmitting) {
+      setForgotPasswordOpen(false);
+      setForgotPasswordError(null);
+      setForgotPasswordSuccess(null);
+      forgotPasswordForm.reset();
     }
   };
 
@@ -112,7 +146,7 @@ export function EmailLogin() {
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="absolute right-0 top-0 h-full"
+                    className="absolute right-0 top-0 h-full px-3"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -129,14 +163,14 @@ export function EmailLogin() {
             control={form.control}
             name="rememberMe"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-end space-x-2">
+              <FormItem className="flex flex-row items-center space-x-2">
                 <FormControl>
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={field.onChange}
                   />
                 </FormControl>
-                <FormLabel className="text-sm font-normal leading-none">Remember me</FormLabel>
+                <FormLabel className="text-sm font-normal leading-none cursor-pointer">Remember me</FormLabel>
               </FormItem>
             )}
           />
@@ -145,19 +179,34 @@ export function EmailLogin() {
             <DialogTrigger asChild>
               <Button
                 variant="link"
-                className="px-0 font-normal"
+                className="px-0 font-normal h-auto relative z-10 hover:no-underline hover:text-primary"
                 type="button"
+                onClick={() => {
+                  setForgotPasswordOpen(true);
+                  setForgotPasswordError(null);
+                  setForgotPasswordSuccess(null);
+                }}
               >
                 Forgot password?
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="sm:max-w-md">
               <DialogHeader>
                 <DialogTitle>Reset Password</DialogTitle>
                 <DialogDescription>
                   Enter your email address and we'll send you a link to reset your password.
                 </DialogDescription>
               </DialogHeader>
+              {forgotPasswordError && (
+                <Alert variant="destructive">
+                  <AlertDescription>{forgotPasswordError}</AlertDescription>
+                </Alert>
+              )}
+              {forgotPasswordSuccess && (
+                <Alert>
+                  <AlertDescription>{forgotPasswordSuccess}</AlertDescription>
+                </Alert>
+              )}
               <Form {...forgotPasswordForm}>
                 <form onSubmit={forgotPasswordForm.handleSubmit(onForgotPassword)} className="space-y-4">
                   <FormField
@@ -167,7 +216,16 @@ export function EmailLogin() {
                       <FormItem>
                         <FormLabel>Email</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your email" type="email" {...field} />
+                          <Input 
+                            placeholder="Enter your email" 
+                            type="email" 
+                            {...field} 
+                            onChange={(e) => {
+                              field.onChange(e);
+                              setForgotPasswordError(null);
+                              setForgotPasswordSuccess(null);
+                            }}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -177,15 +235,16 @@ export function EmailLogin() {
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() => setForgotPasswordOpen(false)}
+                      onClick={handleDialogClose}
+                      disabled={isSubmitting}
                     >
                       Cancel
                     </Button>
                     <Button 
                       type="submit"
-                      disabled={forgotPasswordForm.formState.isSubmitting}
+                      disabled={isSubmitting}
                     >
-                      {forgotPasswordForm.formState.isSubmitting && (
+                      {isSubmitting && (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       )}
                       Send Reset Link
